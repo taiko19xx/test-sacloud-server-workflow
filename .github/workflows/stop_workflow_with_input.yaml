@@ -1,0 +1,39 @@
+on:
+    workflow_dispatch:
+        inputs:
+            server_id:
+                description: 'Server ID to start'
+                required: true
+                default: ''
+            server_zone:
+                description: 'Server Zone'
+                required: true
+                default: 'is1b'
+                type: choice
+                options:
+                    - is1a
+                    - is1b
+                    - is1c
+                    - tk1a
+                    - tk1b
+                    - tk1v
+
+jobs:
+    stop-server:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: install usacloud
+              run: |
+                curl -fsSL https://github.com/sacloud/usacloud/releases/latest/download/install.sh | bash
+            
+            - name: Stop server
+              if: ${{ github.event.inputs.server_id != '' }}
+              run: |
+                usacloud iaas server shutdown ${{ github.event.inputs.server_id }} -y
+              env:
+                SAKURACLOUD_ACCESS_TOKEN: ${{ vars.SAKURACLOUD_ACCESS_TOKEN }}
+                SAKURACLOUD_ACCESS_TOKEN_SECRET: ${{ secrets.SAKURACLOUD_ACCESS_TOKEN_SECRET }}
+                SAKURACLOUD_ZONE: ${{ github.event.inputs.server_zone }}
