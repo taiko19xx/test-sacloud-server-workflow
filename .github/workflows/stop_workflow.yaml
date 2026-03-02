@@ -1,0 +1,25 @@
+on:
+    workflow_dispatch:
+
+env:
+    SERVER_ID: 113800504878
+    SERVER_ZONE: is1b
+
+jobs:
+    stop-server:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: install usacloud
+              run: |
+                curl -fsSL https://github.com/sacloud/usacloud/releases/latest/download/install.sh | bash
+            
+            - name: Stop server
+              run: |
+                usacloud iaas server shutdown ${{ env.SERVER_ID }} -y
+              env:
+                SAKURACLOUD_ACCESS_TOKEN: ${{ vars.SAKURACLOUD_ACCESS_TOKEN }}
+                SAKURACLOUD_ACCESS_TOKEN_SECRET: ${{ secrets.SAKURACLOUD_ACCESS_TOKEN_SECRET }}
+                SAKURACLOUD_ZONE: ${{ env.SERVER_ZONE }}
